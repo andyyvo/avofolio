@@ -2,6 +2,10 @@
 	import { CursorDirections } from "$lib/constants/cursorDirections";
 	import { CursorDirection } from "$lib/stores/cursorDirection";
 	import { spring, tweened } from "svelte/motion"
+  
+  /*==== debounce timer cursor ====*/
+  let mouseUpdateDelay: number
+  let mouseSaveDelay: number
 
   /*==== motion states ====*/
 	const mouseCoords = spring({ x: 0, y: 0 })
@@ -10,44 +14,36 @@
   let lastY: number = 0
 
   /*==== motion handlers ====*/
-  const onMouseDown = (event: MouseEvent) => {
-    lastX = event.clientX
-    lastY = event.clientY
-  }
-
 	const onMouseMove = (event: MouseEvent) => {
-		$mouseCoords = { x: event.x, y: event.y }
+    $mouseCoords = { x: event.x, y: event.y }
     
-    console.log('>>> x', event.clientX)
-    console.log('>>> y', event.clientY)
+    /* debouncing  */
+    clearTimeout(mouseUpdateDelay)
+    mouseUpdateDelay = setTimeout(() => {
 
-    // if (event.movementX > event.movementY) {
-    //   if (event.movementX > 0) { // positive x
-    //     CursorDirection.set(CursorDirections.Right)
-    //   } else if (event.movementX < 0) { // negative x
-    //     CursorDirection.set(CursorDirections.Left)
-    //   }
-    // } else if (event.movementY > event.movementX) {
-    //   if (event.movementY > 0) {
-    //     CursorDirection.set(CursorDirections.Up)
-    //   } else if (event.movementY < 0) {
-    //     CursorDirection.set(CursorDirections.Down)
-    //   }
-    // }
-    // CursorDirection.subscribe(value => {
-    //   console.log(value)
-    // })
-
-    let dx: number = event.clientX - lastX;
-    let dy: number = event.clientY - lastY;
-    if(Math.abs(dx) > Math.abs(dy))
-      CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left);
-    else
-      CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up);
-
-    CursorDirection.subscribe(value => {
-      // console.log(value)
-    })
+      clearTimeout(mouseSaveDelay)
+      mouseSaveDelay = setTimeout(() => {
+        lastX = event.clientX
+        lastY = event.clientY
+        // console.log('>>> x', event.clientX)
+        // console.log('>>> y', event.clientY)
+      }, 120)
+  
+      let dx: number = event.clientX - lastX;
+      let dy: number = event.clientY - lastY;
+  
+      // console.log('>>> dx', dx)
+      // console.log('>>> dy', dy)
+  
+      if(Math.abs(dx) > Math.abs(dy))
+        CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left);
+      else
+        CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up);
+  
+      CursorDirection.subscribe(value => {
+        console.log('>>> direction', value)
+      })
+    }, 1)
 	}
 
 	const onMouseOver = (event: MouseEvent) => {
@@ -70,8 +66,7 @@
 </script>
 
 <svelte:window 
-  on:mousedown={onMouseDown}
-	on:mousemove={onMouseMove} 
+	on:mousemove={onMouseMove}
 	on:mouseover={onMouseOver}
 	on:mouseout={onMouseOut}
 />
