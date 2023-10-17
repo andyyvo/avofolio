@@ -15,12 +15,14 @@
 
   /*==== motion handlers ====*/
 	const onMouseMove = (event: MouseEvent) => {
+    // mouse position
     $mouseCoords = { x: event.x, y: event.y }
     
-    /* debouncing  */
+    // debouncing to smooth direction assignment
     clearTimeout(mouseUpdateDelay)
     mouseUpdateDelay = setTimeout(() => {
 
+      // delaying last saved coords to give mouse movement more effect
       clearTimeout(mouseSaveDelay)
       mouseSaveDelay = setTimeout(() => {
         lastX = event.clientX
@@ -29,20 +31,21 @@
         // console.log('>>> y', event.clientY)
       }, 120)
   
+      // calc distance traveled
       let dx: number = event.clientX - lastX;
       let dy: number = event.clientY - lastY;
   
       // console.log('>>> dx', dx)
       // console.log('>>> dy', dy)
   
-      if(Math.abs(dx) > Math.abs(dy))
+      if(Math.abs(dx) > Math.abs(dy)) // lateral
         CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left);
-      else
+      else // vertical
         CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up);
   
-      CursorDirection.subscribe(value => {
-        console.log('>>> direction', value)
-      })
+      // CursorDirection.subscribe(value => {
+      //   console.log('>>> direction', value)
+      // })
     }, 1)
 	}
 
