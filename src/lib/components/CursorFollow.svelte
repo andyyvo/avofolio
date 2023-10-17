@@ -12,6 +12,7 @@
 	const scale = tweened(1, { duration: 100 })
   let lastX: number = 0
   let lastY: number = 0
+  let cursorClassName = "cursor"
 
   /*==== motion handlers ====*/
 	const onMouseMove = (event: MouseEvent) => {
@@ -38,11 +39,13 @@
       // console.log('>>> dx', dx)
       // console.log('>>> dy', dy)
   
-      if(Math.abs(dx) > Math.abs(dy)) // lateral
-        CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left);
-      else // vertical
-        CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up);
-  
+      if(Math.abs(dx) > Math.abs(dy)) { // lateral
+        CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left)
+        cursorClassName = (dx > 0) ? "cursor right" : "cursor left"
+      } else { // vertical
+        CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up)
+        cursorClassName = (dy > 0) ? "cursor down" : "cursor up"
+      }
       // CursorDirection.subscribe(value => {
       //   console.log('>>> direction', value)
       // })
@@ -62,10 +65,6 @@
 	const onMouseOut = () => {
 		$scale = 1
 	}
-
-  // const cursorClass: string = () => {
-  //   if (CursorDirection === Cur)
-  // }
 </script>
 
 <svelte:window 
@@ -76,7 +75,7 @@
 
 <div class="container">
 	<div 
-		class="cursor"
+		class={cursorClassName}
 		style:--x={`${$mouseCoords.x}px`}
 		style:--y={`${$mouseCoords.y}px`}
 		style:--scale={$scale}
