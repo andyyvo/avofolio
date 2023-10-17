@@ -82,7 +82,7 @@
 	/>
 </div>
 
-<style>
+<style lang="scss">
 	.container {
 		position: fixed;
 		top: 20;
@@ -100,7 +100,19 @@
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;
-		border: 2px solid red;
+    &.left {
+      border: 2px solid red;
+    }
+    &.right {
+      border: 2px solid blue;
+    }
+    &.up {
+      border: 2px solid green;
+    }
+    &.down {
+      border: 2px solid yellow;
+    }
+    border: 2px solid black;
 		
 		transform: translate(-50%, -50%) translate(var(--x, 0px), var(--y, 0px)) scale(var(--scale, 1));
 	}
