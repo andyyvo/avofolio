@@ -1,70 +1,75 @@
 <script lang="ts">
 	import { CursorDirections } from "$lib/constants/cursorDirections";
 	import { CursorDirection } from "$lib/stores/cursorDirection";
-	import { spring, tweened } from "svelte/motion"
-  
-  /*==== debounce timer cursor ====*/
-  let mouseUpdateDelay: number
-  let mouseSaveDelay: number
+	import { spring, tweened } from "svelte/motion";
 
-  /*==== motion states ====*/
-	const mouseCoords = spring({ x: 0, y: 0 })
-	const scale = tweened(1, { duration: 100 })
-  let lastX: number = 0
-  let lastY: number = 0
-  let cursorClassName = "cursor"
+	/*==== motion states ====*/
+	const mouseCoords = spring({ x: 0, y: 0 });
+	const scale = tweened(1, { duration: 100 });
 
-  /*==== motion handlers ====*/
+	/*==== direction detection state ====*/
+	let accumulatedDx = 0;
+	let accumulatedDy = 0;
+	let lastDirection: CursorDirections = CursorDirections.Down;
+	let cursorClassName = "cursor down";
+	let resetTimer: number;
+
+	/*==== angle-based direction detection ====*/
+	const getDirectionFromAngle = (dx: number, dy: number): CursorDirections | null => {
+		// dead zone - ignore micro movements
+		const magnitude = Math.sqrt(dx * dx + dy * dy);
+		if (magnitude < 3) return null;
+
+		// calculate angle in degrees (0-360)
+		const angle = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+
+		// map to cardinal directions with 90° wedges
+		// right: 315-45°, down: 45-135°, left: 135-225°, up: 225-315°
+		if (angle >= 315 || angle < 45) return CursorDirections.Right;
+		if (angle >= 45 && angle < 135) return CursorDirections.Down;
+		if (angle >= 135 && angle < 225) return CursorDirections.Left;
+		return CursorDirections.Up;
+	};
+
+	/*==== motion handlers ====*/
 	const onMouseMove = (event: MouseEvent) => {
-    // mouse position
-    $mouseCoords = { x: event.x, y: event.y }
-    
-    // debouncing to smooth direction assignment
-    clearTimeout(mouseUpdateDelay)
-    mouseUpdateDelay = setTimeout(() => {
+		// always update position for smooth following
+		$mouseCoords = { x: event.clientX, y: event.clientY };
 
-      // delaying last saved coords to give mouse movement more effect
-      clearTimeout(mouseSaveDelay)
-      mouseSaveDelay = setTimeout(() => {
-        lastX = event.clientX
-        lastY = event.clientY
-        // console.log('>>> x', event.clientX)
-        // console.log('>>> y', event.clientY)
-      }, 120)
-  
-      // calc distance traveled
-      let dx: number = event.clientX - lastX;
-      let dy: number = event.clientY - lastY;
-  
-      // console.log('>>> dx', dx)
-      // console.log('>>> dy', dy)
-  
-      if(Math.abs(dx) > Math.abs(dy)) { // lateral
-        CursorDirection.set((dx > 0) ? CursorDirections.Right : CursorDirections.Left)
-        cursorClassName = (dx > 0) ? "cursor right" : "cursor left"
-      } else { // vertical
-        CursorDirection.set((dy > 0) ? CursorDirections.Down : CursorDirections.Up)
-        cursorClassName = (dy > 0) ? "cursor down" : "cursor up"
-      }
-      // CursorDirection.subscribe(value => {
-      //   console.log('>>> direction', value)
-      // })
-    }, 1)
-	}
+		// accumulate movement deltas (native movementX/Y is more accurate!)
+		accumulatedDx += event.movementX;
+		accumulatedDy += event.movementY;
+
+		// reset accumulator after brief pause to keep it fresh
+		clearTimeout(resetTimer);
+		resetTimer = setTimeout(() => {
+			accumulatedDx = 0;
+			accumulatedDy = 0;
+		}, 50);
+
+		// detect direction from accumulated movement
+		const newDirection = getDirectionFromAngle(accumulatedDx, accumulatedDy);
+
+		if (newDirection && newDirection !== lastDirection) {
+			lastDirection = newDirection;
+			CursorDirection.set(newDirection);
+			cursorClassName = `cursor ${newDirection.toLowerCase()}`;
+		}
+	};
 
 	const onMouseOver = (event: MouseEvent) => {
 		if (event.target instanceof HTMLButtonElement) {
-			$scale = 2
+			$scale = 2;
 		} else if (event.target instanceof HTMLParagraphElement) {
-			$scale = 1.5
+			$scale = 1.5;
 		} else {
-			$scale = 1
+			$scale = 1;
 		}
-	}
+	};
 
 	const onMouseOut = () => {
-		$scale = 1
-	}
+		$scale = 1;
+	};
 </script>
 
 <svelte:window 
