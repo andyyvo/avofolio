@@ -1,11 +1,11 @@
 export const CLOTH_RESOLUTION = 46;
-export const CLOTH_OVERFLOW = 0.07;
+export const CLOTH_OVERFLOW = 0.05;
 export const CLOTH_DAMPING = 0.988;
 export const CLOTH_CONSTRAINT_ITERATIONS = 3;
 export const CLOTH_SHEAR_STIFFNESS = 0.08;
 export const CLOTH_RETURN_SPEED = 0.008;
 export const CLOTH_RETURN_BOOST = 0.05;
-export const CLOTH_RETURN_FAR = 0.12;
+export const CLOTH_RETURN_FAR = 0.025;
 export const CLOTH_SETTLE_THRESHOLD = 0.12;
 export const CLOTH_DRAG_FOLLOW = 0.035;
 
