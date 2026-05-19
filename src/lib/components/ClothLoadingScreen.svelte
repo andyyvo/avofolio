@@ -93,6 +93,8 @@
   let dismissStart = 0;
   let dismissVx = 0;
   let dismissVy = 0;
+  let dismissOriginX = 0;
+  let dismissOriginY = 0;
 
   const idx = (i: number, j: number) => j * N + i;
 
@@ -326,9 +328,13 @@
     }
 
     if (dismissing) {
+      const maxDiag = Math.hypot(W, H);
       for (const p of particles) {
-        p.x += dismissVx * 0.016;
-        p.y += dismissVy * 0.016;
+        const dist = Math.hypot(p.ox - dismissOriginX, p.oy - dismissOriginY);
+        const proximity = 1 - Math.min(1, dist / maxDiag);
+        const speedMult = 0.25 + proximity * 1.8;
+        p.x += dismissVx * 0.016 * speedMult;
+        p.y += dismissVy * 0.016 * speedMult;
       }
     }
 
@@ -446,6 +452,11 @@
     const mag = Math.hypot(dx, dy) || 1;
     dismissVx = (dx / mag) * DISMISS_VELOCITY * 60;
     dismissVy = (dy / mag) * DISMISS_VELOCITY * 60;
+    if (drag) {
+      const p = particles[drag.particleIndex];
+      dismissOriginX = p.x;
+      dismissOriginY = p.y;
+    }
     for (const p of particles) {
       p.pinned = false;
     }
