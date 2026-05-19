@@ -1,8 +1,10 @@
 <script lang="ts">
   import CursorFollow from "$lib/components/CursorFollow.svelte";
+  import LoadingScreen from "$lib/components/LoadingScreen.svelte";
 </script>
 
 <div id="andy-vo-portfolio">
+  <LoadingScreen />
   <CursorFollow />
   <slot class="the-andy-vo-app" />
 </div>
