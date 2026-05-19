@@ -20,6 +20,9 @@ export const LOADING_REVEAL_MS = 1600;
 export const TIP_OVERSHOOT = 2.5;
 export const FANG_CURVATURE = 0.55;
 export const BASE_RUSH = 1.5;
+export const WORD_DRAG_K = 0.55;
+export const WORD_DRAG_S = 0.18;
+export const WORD_DRAG_LAG = 1.6;
 
 export const ALL_CORNERS: readonly LoadingCorner[] = [
   LoadingCorner.TopLeft,

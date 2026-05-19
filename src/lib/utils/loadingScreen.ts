@@ -3,8 +3,55 @@ import {
   BASE_RUSH,
   FANG_CURVATURE,
   LoadingCorner,
-  TIP_OVERSHOOT
+  TIP_OVERSHOOT,
+  WORD_DRAG_K,
+  WORD_DRAG_LAG,
+  WORD_DRAG_S,
+  type LoadingText
 } from "$lib/constants/loadingScreen";
+
+export type WordKey = keyof LoadingText;
+
+const WORD_POSITIONS: Record<WordKey, { x: number; y: number }> = {
+  topLeft: { x: 0, y: 0 },
+  topRight: { x: 1, y: 0 },
+  bottomLeft: { x: 0, y: 1 },
+  bottomRight: { x: 1, y: 1 },
+  center: { x: 0.5, y: 0.5 }
+};
+
+const getAnchorFraction = (corner: LoadingCorner): { x: number; y: number } => {
+  switch (corner) {
+    case LoadingCorner.TopLeft:
+      return { x: 0, y: 0 };
+    case LoadingCorner.TopRight:
+      return { x: 1, y: 0 };
+    case LoadingCorner.BottomLeft:
+      return { x: 0, y: 1 };
+    case LoadingCorner.BottomRight:
+      return { x: 1, y: 1 };
+  }
+};
+
+export const buildWordPull = (
+  key: WordKey,
+  corner: LoadingCorner,
+  progress: number,
+  width: number,
+  height: number
+): string => {
+  const word = WORD_POSITIONS[key];
+  const anchor = getAnchorFraction(corner);
+  const dxRaw = anchor.x - word.x;
+  const dyRaw = anchor.y - word.y;
+  const normalizedDist = Math.min(1, Math.hypot(dxRaw, dyRaw) / Math.SQRT2);
+  const lagPower = 1 + normalizedDist * WORD_DRAG_LAG;
+  const easedProgress = Math.pow(progress, lagPower);
+  const dx = dxRaw * width * easedProgress * WORD_DRAG_K;
+  const dy = dyRaw * height * easedProgress * WORD_DRAG_K;
+  const scale = 1 - easedProgress * WORD_DRAG_S;
+  return `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${scale.toFixed(3)})`;
+};
 
 export const pickRandomCorner = (): LoadingCorner => {
   return ALL_CORNERS[Math.floor(Math.random() * ALL_CORNERS.length)];

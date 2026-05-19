@@ -9,7 +9,7 @@
     LoadingCorner,
     type LoadingText
   } from "$lib/constants/loadingScreen";
-  import { buildTearPath, resolveCorner } from "$lib/utils/loadingScreen";
+  import { buildTearPath, buildWordPull, resolveCorner } from "$lib/utils/loadingScreen";
   import { isLoading } from "$lib/stores/loadingScreen";
 
   export let pullFrom: LoadingCorner | "random" = "random";
@@ -29,6 +29,11 @@
   let viewportH = 0;
 
   $: pathD = buildTearPath($progress, viewportW, viewportH, resolvedCorner);
+  $: pullTopLeft = buildWordPull("topLeft", resolvedCorner, $progress, viewportW, viewportH);
+  $: pullTopRight = buildWordPull("topRight", resolvedCorner, $progress, viewportW, viewportH);
+  $: pullBottomLeft = buildWordPull("bottomLeft", resolvedCorner, $progress, viewportW, viewportH);
+  $: pullBottomRight = buildWordPull("bottomRight", resolvedCorner, $progress, viewportW, viewportH);
+  $: pullCenter = buildWordPull("center", resolvedCorner, $progress, viewportW, viewportH);
 
   let removed = false;
   let holdTimer: ReturnType<typeof setTimeout>;
@@ -81,11 +86,11 @@
     aria-label={ariaLabel}
     role="img"
   >
-    <span class="word top-left">{text.topLeft}</span>
-    <span class="word top-right">{text.topRight}</span>
-    <span class="word bottom-left">{text.bottomLeft}</span>
-    <span class="word bottom-right">{text.bottomRight}</span>
-    <span class="word center">{text.center}</span>
+    <span class="word top-left"><span class="word-pull" style:transform={pullTopLeft}>{text.topLeft}</span></span>
+    <span class="word top-right"><span class="word-pull" style:transform={pullTopRight}>{text.topRight}</span></span>
+    <span class="word bottom-left"><span class="word-pull" style:transform={pullBottomLeft}>{text.bottomLeft}</span></span>
+    <span class="word bottom-right"><span class="word-pull" style:transform={pullBottomRight}>{text.bottomRight}</span></span>
+    <span class="word center"><span class="word-pull" style:transform={pullCenter}>{text.center}</span></span>
   </div>
 {/if}
 
@@ -118,6 +123,12 @@
     color: $snow;
     z-index: $z-overlay;
     overflow: hidden;
+  }
+
+  .word-pull {
+    display: inline-block;
+    transform-origin: center;
+    will-change: transform;
   }
 
   .word {
