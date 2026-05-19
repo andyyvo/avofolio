@@ -33,12 +33,17 @@ export const DISMISS_VELOCITY = 1;
 export const CLOTH_BG = "#0012FF";
 export const CLOTH_FG = "#FAFAFA";
 
-export const CLOTH_TEXT = {
-  topLeft: "welcome",
-  topRight: "to",
-  bottomLeft: "my",
-  bottomRight: "corner",
-  center: "of the internet"
+export const CLOTH_FONT_BODY = "'IBM Plex Sans', sans-serif";
+export const CLOTH_FONT_PIXEL = "'Pixelify Sans', monospace";
+
+export const CLOTH_COPY = {
+  smiley: ":DDD",
+  bodyBefore: "Welcome to my corner of the ",
+  bodyPixel: "internet",
+  bodyAfterFirst: ".",
+  bodyAfterRest: "Find your way out of here, and then I'll introduce myself.",
+  progressSuffix: "% complete",
+  footer: "For more information about Andy Vo, you will have to select a corner."
 } as const;
 
-export type ClothText = typeof CLOTH_TEXT;
+export type ClothCopy = typeof CLOTH_COPY;
