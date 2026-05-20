@@ -1,11 +1,15 @@
 ## TL;DR
+
 ...
 
 ## Key Design Decisions
+
 ...
 
 ## Potential Future Implications
+
 ...
 
 ## Closes
+
 ...

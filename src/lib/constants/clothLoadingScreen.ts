@@ -30,20 +30,20 @@ export const DISMISS_THRESHOLD_FRAC = 0.2;
 export const DISMISS_DURATION_MS = 11200;
 export const DISMISS_VELOCITY = 1;
 
-export const CLOTH_BG = "#0012FF";
-export const CLOTH_FG = "#FAFAFA";
+export const CLOTH_BG = '#0012FF';
+export const CLOTH_FG = '#FAFAFA';
 
 export const CLOTH_FONT_BODY = "'IBM Plex Sans', sans-serif";
 export const CLOTH_FONT_PIXEL = "'Pixelify Sans', monospace";
 
 export const CLOTH_COPY = {
-  smiley: ":DDD",
-  bodyBefore: "Welcome to my corner of the ",
-  bodyPixel: "internet",
-  bodyAfterFirst: ".",
-  bodyAfterRest: "Find your way out of here, and then I'll introduce myself.",
-  progressSuffix: "% complete",
-  footer: "For more information about Andy Vo, you'll be playing a little tug of war."
+	smiley: ':DDD',
+	bodyBefore: 'Welcome to my corner of the ',
+	bodyPixel: 'internet',
+	bodyAfterFirst: '.',
+	bodyAfterRest: "Find your way out of here, and then I'll introduce myself.",
+	progressSuffix: '% complete',
+	footer: "For more information about Andy Vo, you'll be playing a little tug of war."
 } as const;
 
 export type ClothCopy = typeof CLOTH_COPY;

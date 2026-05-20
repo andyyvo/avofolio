@@ -1,16 +1,16 @@
 export enum LoadingCorner {
-  TopLeft = "TopLeft",
-  TopRight = "TopRight",
-  BottomLeft = "BottomLeft",
-  BottomRight = "BottomRight"
+	TopLeft = 'TopLeft',
+	TopRight = 'TopRight',
+	BottomLeft = 'BottomLeft',
+	BottomRight = 'BottomRight'
 }
 
 export const LOADING_TEXT = {
-  topLeft: "welcome",
-  topRight: "to",
-  bottomLeft: "my",
-  bottomRight: "corner",
-  center: "of the internet"
+	topLeft: 'welcome',
+	topRight: 'to',
+	bottomLeft: 'my',
+	bottomRight: 'corner',
+	center: 'of the internet'
 } as const;
 
 export type LoadingText = typeof LOADING_TEXT;
@@ -25,8 +25,8 @@ export const WORD_DRAG_S = 0.18;
 export const WORD_DRAG_LAG = 1.6;
 
 export const ALL_CORNERS: readonly LoadingCorner[] = [
-  LoadingCorner.TopLeft,
-  LoadingCorner.TopRight,
-  LoadingCorner.BottomLeft,
-  LoadingCorner.BottomRight
+	LoadingCorner.TopLeft,
+	LoadingCorner.TopRight,
+	LoadingCorner.BottomLeft,
+	LoadingCorner.BottomRight
 ] as const;

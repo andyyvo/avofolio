@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { CursorDirections } from "$lib/constants/cursorDirections";
-	import { CursorDirection } from "$lib/stores/cursorDirection";
-	import { spring, tweened } from "svelte/motion";
+	import { CursorDirections } from '$lib/constants/cursorDirections';
+	import { CursorDirection } from '$lib/stores/cursorDirection';
+	import { spring, tweened } from 'svelte/motion';
 
 	/*==== motion states ====*/
 	const mouseCoords = spring({ x: 0, y: 0 });
@@ -11,7 +11,7 @@
 	let accumulatedDx = 0;
 	let accumulatedDy = 0;
 	let lastDirection: CursorDirections = CursorDirections.Down;
-	let cursorClassName = "cursor down";
+	let cursorClassName = 'cursor down';
 	let resetTimer: number;
 
 	/*==== angle-based direction detection ====*/
@@ -21,7 +21,7 @@
 		if (magnitude < 3) return null;
 
 		// calculate angle in degrees (0-360)
-		const angle = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+		const angle = ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360;
 
 		// map to cardinal directions with 90° wedges
 		// right: 315-45°, down: 45-135°, left: 135-225°, up: 225-315°
@@ -72,14 +72,10 @@
 	};
 </script>
 
-<svelte:window 
-	on:mousemove={onMouseMove}
-	on:mouseover={onMouseOver}
-	on:mouseout={onMouseOut}
-/>
+<svelte:window on:mousemove={onMouseMove} on:mouseover={onMouseOver} on:mouseout={onMouseOut} />
 
 <div class="container">
-	<div 
+	<div
 		class={cursorClassName}
 		style:--x={`${$mouseCoords.x}px`}
 		style:--y={`${$mouseCoords.y}px`}
@@ -105,20 +101,20 @@
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;
-    &.left {
-      border: 2px solid red;
-    }
-    &.right {
-      border: 2px solid blue;
-    }
-    &.up {
-      border: 2px solid green;
-    }
-    &.down {
-      border: 2px solid yellow;
-    }
-    border: 2px solid black;
-		
+		&.left {
+			border: 2px solid red;
+		}
+		&.right {
+			border: 2px solid blue;
+		}
+		&.up {
+			border: 2px solid green;
+		}
+		&.down {
+			border: 2px solid yellow;
+		}
+		border: 2px solid black;
+
 		transform: translate(-50%, -50%) translate(var(--x, 0px), var(--y, 0px)) scale(var(--scale, 1));
 	}
 </style>

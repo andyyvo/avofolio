@@ -265,13 +265,17 @@
 		const footerMaxWidth = isNarrow ? W - padX * 2 : Math.min(W * 0.6, 900);
 		ctx.font = footerFont;
 		const footerWords = copy.footer.split(/(\s+)/).filter((s) => s.length > 0);
-		const footerLines: string[] = [""];
+		const footerLines: string[] = [''];
 		let footerLineWidth = 0;
 		for (const word of footerWords) {
 			const ww = ctx.measureText(word).width;
 			const isSpace = /^\s+$/.test(word);
-			if (!isSpace && footerLineWidth + ww > footerMaxWidth && footerLines[footerLines.length - 1].length > 0) {
-				footerLines.push("");
+			if (
+				!isSpace &&
+				footerLineWidth + ww > footerMaxWidth &&
+				footerLines[footerLines.length - 1].length > 0
+			) {
+				footerLines.push('');
 				footerLineWidth = 0;
 			}
 			if (isSpace && footerLineWidth === 0) continue;
