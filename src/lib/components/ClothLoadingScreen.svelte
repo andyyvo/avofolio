@@ -188,7 +188,8 @@
 		ctx.fillText(copy.smiley, innerX + padX - SMILEY_OPTICAL_LEFT, smileyY);
 
 		const bodyLineHeight = bodySize * 1.4;
-		const bodyMaxWidth = Math.min(W * 0.48, 760);
+		const isNarrow = W < 700;
+		const bodyMaxWidth = isNarrow ? W - padX * 2 : Math.min(W * 0.48, 760);
 		const bodyStartY = innerY + H * 0.5 + bodySize * 0.6;
 
 		type Run = { text: string; font: string; break?: boolean };
@@ -260,10 +261,30 @@
 		ctx.fillText(progressText, innerX + padX - progressBearing, progressY);
 
 		const footerFont = `400 ${footerSize}px ${CLOTH_FONT_BODY}`;
-		const footerBearing = measureLeftBearing(footerFont, copy.footer);
+		const footerLineHeight = footerSize * 1.5;
+		const footerMaxWidth = isNarrow ? W - padX * 2 : Math.min(W * 0.6, 900);
 		ctx.font = footerFont;
-		const footerY = progressY + Math.max(48, bodyLineHeight * 1.6);
-		ctx.fillText(copy.footer, innerX + padX - footerBearing, footerY);
+		const footerWords = copy.footer.split(/(\s+)/).filter((s) => s.length > 0);
+		const footerLines: string[] = [""];
+		let footerLineWidth = 0;
+		for (const word of footerWords) {
+			const ww = ctx.measureText(word).width;
+			const isSpace = /^\s+$/.test(word);
+			if (!isSpace && footerLineWidth + ww > footerMaxWidth && footerLines[footerLines.length - 1].length > 0) {
+				footerLines.push("");
+				footerLineWidth = 0;
+			}
+			if (isSpace && footerLineWidth === 0) continue;
+			footerLines[footerLines.length - 1] += word;
+			footerLineWidth += ww;
+		}
+		let footerY = progressY + Math.max(48, bodyLineHeight * 1.6);
+		for (const line of footerLines) {
+			const footerBearing = measureLeftBearing(footerFont, line);
+			ctx.font = footerFont;
+			ctx.fillText(line, innerX + padX - footerBearing, footerY);
+			footerY += footerLineHeight;
+		}
 
 		if (texture) {
 			texture.needsUpdate = true;

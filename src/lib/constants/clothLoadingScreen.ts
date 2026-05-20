@@ -43,7 +43,7 @@ export const CLOTH_COPY = {
   bodyAfterFirst: ".",
   bodyAfterRest: "Find your way out of here, and then I'll introduce myself.",
   progressSuffix: "% complete",
-  footer: "For more information about Andy Vo, you will have to select a corner."
+  footer: "For more information about Andy Vo, you'll be playing a little tug of war."
 } as const;
 
 export type ClothCopy = typeof CLOTH_COPY;
