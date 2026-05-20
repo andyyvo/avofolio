@@ -19,13 +19,6 @@ export const HOVER_RIPPLE_RADIUS = 90;
 export const CLOTH_Z_HIGHLIGHT = 1.4;
 export const CLOTH_Z_SHADOW = 0.85;
 
-export const CLOTH_LIGHT_DIR_X = -0.5;
-export const CLOTH_LIGHT_DIR_Y = -0.4;
-export const CLOTH_LIGHT_DIR_Z = 1.0;
-export const CLOTH_LIGHT_INTENSITY = 0.35;
-export const CLOTH_AMBIENT_INTENSITY = 1.0;
-export const CLOTH_SHININESS = 30;
-
 export const DISMISS_THRESHOLD_FRAC = 0.2;
 export const DISMISS_DURATION_MS = 11200;
 export const DISMISS_VELOCITY = 1;

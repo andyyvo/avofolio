@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount, createEventDispatcher } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import * as THREE from 'three';
 	import {
 		CLOTH_BG,
@@ -35,7 +35,9 @@
 
 	export let copy: ClothCopy = CLOTH_COPY;
 
-	const dispatch = createEventDispatcher<{ complete: void }>();
+	const ariaText = `${copy.smiley}. ${copy.bodyBefore}${copy.bodyPixel}${copy.bodyAfterFirst} ${copy.bodyAfterRest} ${copy.footer}`;
+	const prefersReducedMotion =
+		typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	let host: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
@@ -99,6 +101,8 @@
 	let dismissOriginY = 0;
 
 	let dragProgress = 0;
+	let lastRenderedProgressBucket = 0;
+	const PROGRESS_RENDER_STEP = 5;
 
 	const idx = (i: number, j: number) => j * N + i;
 
@@ -136,12 +140,20 @@
 			}
 		}
 
+		if (drag) {
+			if (host && host.hasPointerCapture(drag.pointerId)) {
+				host.releasePointerCapture(drag.pointerId);
+			}
+			drag = null;
+			dragProgress = 0;
+			lastRenderedProgressBucket = 0;
+		}
+
 		if (mesh && geometry) {
 			const { extW: eW, extH: eH } = getExt();
 			scene.remove(mesh);
 			geometry.dispose();
 			geometry = new THREE.PlaneGeometry(eW, eH, N - 1, N - 1);
-			geometry.translate(W / 2, H / 2, 0);
 			mesh = new THREE.Mesh(geometry, material);
 			scene.add(mesh);
 			initParticles();
@@ -179,13 +191,13 @@
 		const progressSize = bodySize * 0.95;
 		const footerSize = Math.max(13, minDim * 0.018);
 
-		const SMILEY_OPTICAL_LEFT = smileySize * 0.09;
+		const smileyOpticalLeft = smileySize * 0.09;
 
 		ctx.font = `200 ${smileySize}px ${CLOTH_FONT_BODY}`;
 		ctx.textAlign = 'left';
 		ctx.textBaseline = 'alphabetic';
 		const smileyY = innerY + H * 0.42;
-		ctx.fillText(copy.smiley, innerX + padX - SMILEY_OPTICAL_LEFT, smileyY);
+		ctx.fillText(copy.smiley, innerX + padX - smileyOpticalLeft, smileyY);
 
 		const bodyLineHeight = bodySize * 1.4;
 		const isNarrow = W < 700;
@@ -347,6 +359,8 @@
 	};
 
 	const stepPhysics = () => {
+		const maxDiag = Math.hypot(W, H);
+
 		if (drag) {
 			const p = particles[drag.particleIndex];
 			p.px = p.x;
@@ -357,21 +371,23 @@
 			if (dist > drag.maxDist) drag.maxDist = dist;
 			const dipRaw = -dist * CLOTH_Z_DIP_FACTOR;
 			p.z = Math.max(-CLOTH_Z_MAX, Math.min(CLOTH_Z_MAX, dipRaw));
-			const threshold = Math.hypot(W, H) * DISMISS_THRESHOLD_FRAC;
+			const threshold = maxDiag * DISMISS_THRESHOLD_FRAC;
 			const pct = Math.min(100, Math.round((dist / threshold) * 100));
-			if (pct !== dragProgress) {
-				dragProgress = pct;
+			dragProgress = pct;
+			const bucket = Math.floor(pct / PROGRESS_RENDER_STEP);
+			if (bucket !== lastRenderedProgressBucket) {
+				lastRenderedProgressBucket = bucket;
 				buildTextTexture();
 			}
 			if (drag.maxDist > threshold) {
 				triggerDismiss(p.x - drag.originX, p.y - drag.originY);
 			}
-		} else if (dragProgress !== 0) {
+		} else if (!dismissing && dragProgress !== 0) {
 			dragProgress = 0;
+			lastRenderedProgressBucket = 0;
 			buildTextTexture();
 		}
 
-		const maxDiag = Math.hypot(W, H);
 		const dragX = drag ? drag.targetX : 0;
 		const dragY = drag ? drag.targetY : 0;
 
@@ -434,7 +450,6 @@
 		}
 
 		if (dismissing) {
-			const maxDiag = Math.hypot(W, H);
 			for (const p of particles) {
 				const dist = Math.hypot(p.ox - dismissOriginX, p.oy - dismissOriginY);
 				const proximity = 1 - Math.min(1, dist / maxDiag);
@@ -562,15 +577,18 @@
 			const p = particles[drag.particleIndex];
 			dismissOriginX = p.x;
 			dismissOriginY = p.y;
+			if (host && host.hasPointerCapture(drag.pointerId)) {
+				host.releasePointerCapture(drag.pointerId);
+			}
 		}
 		for (const p of particles) {
 			p.pinned = false;
 		}
 		drag = null;
 		setTimeout(() => {
+			cancelAnimationFrame(rafId);
 			removed = true;
 			isLoading.set(false);
-			dispatch('complete');
 		}, DISMISS_DURATION_MS);
 	};
 
@@ -579,10 +597,10 @@
 		stepPhysics();
 		updateMeshGeometry();
 
-		if (dismissing) {
+		if (dismissing && material) {
 			const elapsed = performance.now() - dismissStart;
 			const t = Math.min(1, elapsed / DISMISS_DURATION_MS);
-			if (material) material.opacity = 1 - t;
+			material.uniforms.opacity.value = 1 - t;
 		}
 
 		renderer.render(scene, camera);
@@ -601,7 +619,6 @@
 
 		const { extW: eW, extH: eH } = getExt();
 		geometry = new THREE.PlaneGeometry(eW, eH, N - 1, N - 1);
-		geometry.translate(W / 2, H / 2, 0);
 
 		texture = new THREE.CanvasTexture(textCanvas);
 		texture.colorSpace = THREE.SRGBColorSpace;
@@ -613,7 +630,8 @@
 				map: { value: texture },
 				zMax: { value: CLOTH_Z_MAX },
 				highlight: { value: CLOTH_Z_HIGHLIGHT },
-				shadow: { value: CLOTH_Z_SHADOW }
+				shadow: { value: CLOTH_Z_SHADOW },
+				opacity: { value: 1 }
 			},
 			vertexShader: `
         varying float vZ;
@@ -632,6 +650,7 @@
         uniform float zMax;
         uniform float highlight;
         uniform float shadow;
+        uniform float opacity;
         varying float vZ;
         varying vec2 vUv;
         void main() {
@@ -640,7 +659,7 @@
           float crest = max(normZ, 0.0);
           float trough = max(-normZ, 0.0);
           vec3 lit = base.rgb + vec3(crest * highlight) - vec3(trough * shadow);
-          gl_FragColor = vec4(clamp(lit, 0.0, 1.0), base.a);
+          gl_FragColor = vec4(clamp(lit, 0.0, 1.0), base.a * opacity);
         }
       `,
 			transparent: true,
@@ -653,6 +672,13 @@
 
 	onMount(() => {
 		isLoading.set(true);
+
+		if (prefersReducedMotion) {
+			removed = true;
+			isLoading.set(false);
+			return;
+		}
+
 		W = window.innerWidth;
 		H = window.innerHeight;
 		dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -687,9 +713,10 @@
 		on:pointermove={onPointerMove}
 		on:pointerup={onPointerUp}
 		on:pointercancel={onPointerUp}
-		role="presentation"
+		role="img"
+		aria-label={ariaText}
 	>
-		<canvas bind:this={canvas} class="cloth-canvas" />
+		<canvas bind:this={canvas} class="cloth-canvas" aria-hidden="true" />
 	</div>
 {/if}
 

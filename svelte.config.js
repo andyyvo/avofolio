@@ -9,8 +9,7 @@ import preprocess from 'svelte-preprocess';
  */
 const config = {
 	preprocess: preprocess({
-		// ...svelte-preprocess options
-		scss: { includePaths: ['./src/scss'] }
+		scss: { includePaths: ['./src/lib/styles'] }
 	}),
 	// ...other svelte options
 	kit: {
