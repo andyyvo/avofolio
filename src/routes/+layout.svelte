@@ -1,9 +1,13 @@
 <script lang="ts">
 	import ClothLoadingScreen from '$lib/components/ClothLoadingScreen.svelte';
 	import CursorFollow from '$lib/components/CursorFollow.svelte';
+	import { clothReady, isLoading } from '$lib/stores/loadingScreen';
 </script>
 
 <div id="andy-vo-portfolio">
+	{#if $isLoading && !$clothReady}
+		<div class="boot-curtain" aria-hidden="true" />
+	{/if}
 	<ClothLoadingScreen />
 	<CursorFollow />
 	<slot class="the-andy-vo-app" />
@@ -32,5 +36,13 @@
 	#andy-vo-portfolio {
 		width: 100%;
 		height: auto;
+	}
+
+	.boot-curtain {
+		position: fixed;
+		inset: 0;
+		background-color: $cobalt;
+		z-index: 9998;
+		pointer-events: none;
 	}
 </style>

@@ -31,7 +31,7 @@
 		DISMISS_VELOCITY,
 		type ClothCopy
 	} from '$lib/constants/clothLoadingScreen';
-	import { isLoading } from '$lib/stores/loadingScreen';
+	import { clothReady, isLoading } from '$lib/stores/loadingScreen';
 
 	export let copy: ClothCopy = CLOTH_COPY;
 
@@ -593,6 +593,7 @@
 	};
 
 	let rafId = 0;
+	let firstFrameRendered = false;
 	const tick = () => {
 		stepPhysics();
 		updateMeshGeometry();
@@ -604,7 +605,28 @@
 		}
 
 		renderer.render(scene, camera);
+		if (!firstFrameRendered) {
+			firstFrameRendered = true;
+			clothReady.set(true);
+		}
 		rafId = requestAnimationFrame(tick);
+	};
+
+	const preloadFonts = async () => {
+		if (typeof document === 'undefined' || !document.fonts) return;
+		const bodySize = Math.max(18, Math.min(window.innerWidth, window.innerHeight) * 0.04);
+		const smileySize = Math.min(window.innerWidth, window.innerHeight) * 0.22;
+		const fontSpecs = [
+			`200 ${smileySize}px ${CLOTH_FONT_BODY}`,
+			`300 ${bodySize}px ${CLOTH_FONT_BODY}`,
+			`400 ${bodySize}px ${CLOTH_FONT_BODY}`,
+			`400 ${bodySize}px ${CLOTH_FONT_PIXEL}`
+		];
+		try {
+			await Promise.all(fontSpecs.map((spec) => document.fonts.load(spec)));
+		} catch {
+			return;
+		}
 	};
 
 	const setupScene = () => {
@@ -670,18 +692,22 @@
 		scene.add(mesh);
 	};
 
-	onMount(() => {
+	onMount(async () => {
 		isLoading.set(true);
 
 		if (prefersReducedMotion) {
 			removed = true;
 			isLoading.set(false);
+			clothReady.set(true);
 			return;
 		}
 
 		W = window.innerWidth;
 		H = window.innerHeight;
 		dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+		await preloadFonts();
+		if (removed) return;
 
 		buildTextTexture();
 		initParticles();
