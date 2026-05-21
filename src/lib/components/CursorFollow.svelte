@@ -10,14 +10,14 @@
 		SHADOW_OFFSET_Y,
 		SHADOW_OPACITY,
 		SHADOW_WIDTH,
-		SPRITE_BOB_MS,
-		SPRITE_BOB_PX,
+		SPRITE_FRAME_MS,
 		SPRITE_H,
 		SPRITE_OFFSET_X,
 		SPRITE_OFFSET_Y,
 		SPRITE_PATHS,
 		SPRITE_W
 	} from '$lib/constants/cursorFollow';
+	import { onDestroy, onMount } from 'svelte';
 	import { spring, tweened } from 'svelte/motion';
 
 	const mouseCoords = spring({ x: 0, y: 0 });
@@ -28,7 +28,20 @@
 	let lastDirection: CursorDirections = CursorDirections.Down;
 	let resetTimer: ReturnType<typeof setTimeout>;
 
-	$: spriteSrc = SPRITE_PATHS[lastDirection];
+	let frameIndex = 0;
+	let frameTimer: ReturnType<typeof setInterval>;
+
+	onMount(() => {
+		frameTimer = setInterval(() => {
+			frameIndex = frameIndex === 0 ? 1 : 0;
+		}, SPRITE_FRAME_MS);
+	});
+
+	onDestroy(() => {
+		clearInterval(frameTimer);
+	});
+
+	$: spriteSrc = SPRITE_PATHS[lastDirection][frameIndex];
 
 	const getDirectionFromAngle = (dx: number, dy: number): CursorDirections | null => {
 		const magnitude = Math.sqrt(dx * dx + dy * dy);
@@ -91,8 +104,6 @@
 		style:--shadow-h={`${SHADOW_HEIGHT}px`}
 		style:--shadow-y={`${SHADOW_OFFSET_Y}px`}
 		style:--shadow-opacity={SHADOW_OPACITY}
-		style:--bob-px={`${SPRITE_BOB_PX}px`}
-		style:--bob-ms={`${SPRITE_BOB_MS}ms`}
 	>
 		<div class="shadow" />
 		<img class="sprite" src={spriteSrc} alt="" draggable="false" />
@@ -155,17 +166,5 @@
 		margin-top: calc(var(--sprite-h) / -2);
 		image-rendering: pixelated;
 		user-select: none;
-		animation: sprite-bob var(--bob-ms) infinite;
-	}
-
-	@keyframes sprite-bob {
-		0%,
-		49.99% {
-			transform: translateY(0);
-		}
-		50%,
-		100% {
-			transform: translateY(calc(var(--bob-px) * -1));
-		}
 	}
 </style>

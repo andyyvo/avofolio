@@ -7,8 +7,7 @@ export const SPRITE_W = SPRITE_NATIVE_W * SPRITE_SCALE;
 export const SPRITE_H = SPRITE_NATIVE_H * SPRITE_SCALE;
 export const SPRITE_OFFSET_X = 24;
 export const SPRITE_OFFSET_Y = 28;
-export const SPRITE_BOB_PX = 2;
-export const SPRITE_BOB_MS = 520;
+export const SPRITE_FRAME_MS = 260;
 export const SHADOW_WIDTH = SPRITE_W * 0.7;
 export const SHADOW_HEIGHT = SPRITE_W * 0.18;
 export const SHADOW_OPACITY = 0.35;
@@ -18,9 +17,21 @@ export const HOVER_SCALE_PARAGRAPH = 1.15;
 export const DIRECTION_DEADZONE_PX = 3;
 export const DIRECTION_RESET_MS = 50;
 
-export const SPRITE_PATHS: Record<CursorDirections, string> = {
-	[CursorDirections.Up]: '/images/cursor-follow/victini/victini-up.png',
-	[CursorDirections.Down]: '/images/cursor-follow/victini/victini-down.png',
-	[CursorDirections.Left]: '/images/cursor-follow/victini/victini-left.png',
-	[CursorDirections.Right]: '/images/cursor-follow/victini/victini-right.png'
+export const SPRITE_PATHS: Record<CursorDirections, [string, string]> = {
+	[CursorDirections.Up]: [
+		'/images/cursor-follow/victini/victini-up.png',
+		'/images/cursor-follow/victini/victini-up-2.png'
+	],
+	[CursorDirections.Down]: [
+		'/images/cursor-follow/victini/victini-down.png',
+		'/images/cursor-follow/victini/victini-down-2.png'
+	],
+	[CursorDirections.Left]: [
+		'/images/cursor-follow/victini/victini-left.png',
+		'/images/cursor-follow/victini/victini-left-2.png'
+	],
+	[CursorDirections.Right]: [
+		'/images/cursor-follow/victini/victini-right.png',
+		'/images/cursor-follow/victini/victini-right-2.png'
+	]
 };
