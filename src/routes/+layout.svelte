@@ -30,7 +30,7 @@
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		// background-color: $snow;
+		background-color: $white;
 	}
 
 	#andy-vo-portfolio {
@@ -41,7 +41,7 @@
 	.boot-curtain {
 		position: fixed;
 		inset: 0;
-		background-color: $cobalt;
+		background-color: $blue;
 		z-index: 9998;
 		pointer-events: none;
 	}

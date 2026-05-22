@@ -25,7 +25,7 @@
 		HOVER_RIPPLE_STRENGTH,
 		CLOTH_COPY,
 		CLOTH_FONT_BODY,
-		CLOTH_FONT_PIXEL,
+		CLOTH_FONT_ACCENT,
 		DISMISS_DURATION_MS,
 		DISMISS_THRESHOLD_FRAC,
 		DISMISS_VELOCITY,
@@ -35,7 +35,7 @@
 
 	export let copy: ClothCopy = CLOTH_COPY;
 
-	const ariaText = `${copy.smiley}. ${copy.bodyBefore}${copy.bodyPixel}${copy.bodyAfterFirst} ${copy.bodyAfterRest} ${copy.footer}`;
+	const ariaText = `${copy.smiley}. ${copy.bodyBefore}${copy.bodyAccent}${copy.bodyAfterFirst} ${copy.bodyAfterRest} ${copy.footer}`;
 	const prefersReducedMotion =
 		typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -186,10 +186,10 @@
 		const minDim = Math.min(W, H);
 
 		const smileySize = minDim * 0.22;
-		const bodySize = Math.max(18, minDim * 0.04);
-		const pixelSize = bodySize * 1.05;
+		const bodySize = Math.max(14, minDim * 0.028);
+		const accentSize = bodySize * 1.05;
 		const progressSize = bodySize * 0.95;
-		const footerSize = Math.max(13, minDim * 0.018);
+		const footerSize = Math.max(12, minDim * 0.016);
 
 		const smileyOpticalLeft = smileySize * 0.09;
 
@@ -200,16 +200,15 @@
 		ctx.fillText(copy.smiley, innerX + padX - smileyOpticalLeft, smileyY);
 
 		const bodyLineHeight = bodySize * 1.4;
-		const isNarrow = W < 700;
-		const bodyMaxWidth = isNarrow ? W - padX * 2 : Math.min(W * 0.48, 760);
+		const bodyMaxWidth = W - padX * 2;
 		const bodyStartY = innerY + H * 0.5 + bodySize * 0.6;
 
 		type Run = { text: string; font: string; break?: boolean };
 		const bodyFont = `300 ${bodySize}px ${CLOTH_FONT_BODY}`;
-		const pixelFont = `400 ${pixelSize}px ${CLOTH_FONT_PIXEL}`;
+		const accentFont = `italic 400 ${accentSize}px ${CLOTH_FONT_ACCENT}`;
 		const runs: Run[] = [
 			{ text: copy.bodyBefore, font: bodyFont },
-			{ text: copy.bodyPixel, font: pixelFont },
+			{ text: copy.bodyAccent, font: accentFont },
 			{ text: copy.bodyAfterFirst, font: bodyFont, break: true },
 			{ text: copy.bodyAfterRest, font: bodyFont }
 		];
@@ -274,7 +273,7 @@
 
 		const footerFont = `400 ${footerSize}px ${CLOTH_FONT_BODY}`;
 		const footerLineHeight = footerSize * 1.5;
-		const footerMaxWidth = isNarrow ? W - padX * 2 : Math.min(W * 0.6, 900);
+		const footerMaxWidth = W - padX * 2;
 		ctx.font = footerFont;
 		const footerWords = copy.footer.split(/(\s+)/).filter((s) => s.length > 0);
 		const footerLines: string[] = [''];
@@ -614,13 +613,14 @@
 
 	const preloadFonts = async () => {
 		if (typeof document === 'undefined' || !document.fonts) return;
-		const bodySize = Math.max(18, Math.min(window.innerWidth, window.innerHeight) * 0.04);
-		const smileySize = Math.min(window.innerWidth, window.innerHeight) * 0.22;
+		const minDim = Math.min(window.innerWidth, window.innerHeight);
+		const bodySize = Math.max(14, minDim * 0.028);
+		const smileySize = minDim * 0.22;
 		const fontSpecs = [
 			`200 ${smileySize}px ${CLOTH_FONT_BODY}`,
 			`300 ${bodySize}px ${CLOTH_FONT_BODY}`,
 			`400 ${bodySize}px ${CLOTH_FONT_BODY}`,
-			`400 ${bodySize}px ${CLOTH_FONT_PIXEL}`
+			`italic 400 ${bodySize}px ${CLOTH_FONT_ACCENT}`
 		];
 		try {
 			await Promise.all(fontSpecs.map((spec) => document.fonts.load(spec)));
