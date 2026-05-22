@@ -185,7 +185,7 @@
 		const padX = Math.max(24, W * 0.045);
 		const minDim = Math.min(W, H);
 
-		const smileySize = minDim * 0.22;
+		const smileySize = minDim * 0.32;
 		const bodySize = Math.max(14, minDim * 0.028);
 		const accentSize = bodySize * 1.05;
 		const progressSize = bodySize * 0.95;
@@ -615,7 +615,7 @@
 		if (typeof document === 'undefined' || !document.fonts) return;
 		const minDim = Math.min(window.innerWidth, window.innerHeight);
 		const bodySize = Math.max(14, minDim * 0.028);
-		const smileySize = minDim * 0.22;
+		const smileySize = minDim * 0.32;
 		const fontSpecs = [
 			`200 ${smileySize}px ${CLOTH_FONT_BODY}`,
 			`300 ${bodySize}px ${CLOTH_FONT_BODY}`,
