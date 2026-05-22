@@ -111,19 +111,6 @@
 </div>
 
 <style lang="scss">
-	:global(body) {
-		cursor: none;
-	}
-
-	:global(a),
-	:global(button),
-	:global(input),
-	:global(textarea),
-	:global(select),
-	:global(label) {
-		cursor: none;
-	}
-
 	.container {
 		position: fixed;
 		inset: 0;
